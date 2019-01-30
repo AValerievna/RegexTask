@@ -51,7 +51,7 @@ public class RegexWorker {
         }
 
         if (allLines != null) {
-            for (int i = 1; i < linesCount; i++) {
+            for (int i = 0; i < linesCount; i++) {
                 doCommandWithLine(allLines.get(i));
             }
         }
@@ -67,8 +67,6 @@ public class RegexWorker {
         } else {
             m = ADD_PATT.matcher(line);
             if (m.matches()) {
-                System.out.println(m.group("arr1"));
-                System.out.println(m.group("num"));
                 cw.addIntoArray(m.group("arr1"), Integer.parseInt(m.group("num")));
             } else {
                 m = DIFF_PATT.matcher(line);
