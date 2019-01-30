@@ -19,6 +19,7 @@ public class CommandWorker {
     }
 
     void addIntoArray(String arrName, int number) {
+        System.out.println(arraysMap.get(arrName));
         arraysMap.get(arrName).add(number);
     }
 

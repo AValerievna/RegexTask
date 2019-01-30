@@ -15,16 +15,15 @@ import java.util.regex.Pattern;
 
 public class RegexWorker {
     private static final String REGEXP_1 = "\\.([^.]+)$";
-    public static final Pattern CREATE_PATT = Pattern.compile("^create +[a-zA-Z_$]+[\\w_$]* *$");
-    private static final Pattern ADD_PATT = Pattern.compile("^add +[a-zA-Z_$]+[\\w_$]* +\\d+ *$");
-    private static final Pattern DIFF_PATT = Pattern.compile("^diff +[a-zA-Z_$]+[\\w_$]* +[a-zA-Z_$]+[\\w_$]* *$");
-    private static final Pattern AND_PATT = Pattern.compile("^and +[a-zA-Z_$]+[\\w_$]* +[a-zA-Z_$]+[\\w_$]* *$");
-    private static final Pattern DEL_N_PATT = Pattern.compile("del +[a-zA-Z_$]+[\\w_$]* +\\d+ *$");
-    private static final Pattern DEL_ALL_PATT = Pattern.compile("del +[a-zA-Z_$]+[\\w_$]* *$");
+    public static final Pattern CREATE_PATT = Pattern.compile("^create\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    private static final Pattern ADD_PATT = Pattern.compile("^add\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
+    private static final Pattern DIFF_PATT = Pattern.compile("^diff\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<arr2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    private static final Pattern AND_PATT = Pattern.compile("^and\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<arr2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    private static final Pattern DEL_N_PATT = Pattern.compile("^del\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
+    private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
     protected static Logger log;
     public static Configuration conf;
-    List<Integer> a, b, res;
-    String d;
+    static CommandWorker cw;
 
 
     public static void main(String[] args) {
@@ -34,7 +33,7 @@ public class RegexWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        CommandWorker cw = new CommandWorker();
+        cw = new CommandWorker();
 
         String pathStr = conf.getProperty("file.path");
         Path path = Paths.get(pathStr);
@@ -61,33 +60,39 @@ public class RegexWorker {
     }
 
     private static void doCommandWithLine(String line) {
-        if (checkWithRegExp(line, CREATE_PATT) != null) {
-            //cw.createArray();
-        } else if (checkWithRegExp(line, ADD_PATT) != null) {
-            //cw.addIntoArray(this.a, 8);
-        } else if (checkWithRegExp(line, DIFF_PATT) != null) {
-            //cw.findArraysDiff();
-        } else if (checkWithRegExp(line, AND_PATT) != null) {
-            //cw.findArraysCommon();
-        } else if (checkWithRegExp(line, DEL_N_PATT) != null) {
-            //cw.delElemsArray();
-        } else if (checkWithRegExp(line, DEL_ALL_PATT) != null) {
-            //cw.delNumberOfLinesInArray();
-        } else {
-            log.info("Unable to parse command");
-        }
-    }
 
-    public static String checkWithRegExp(String str, Pattern patt) {
-        Matcher m = patt.matcher(str);
+        Matcher m = CREATE_PATT.matcher(line);
         if (m.matches()) {
-            System.out.println(m.matches());
-            String parsedLine = m.group();
-            System.out.println(m.group());
-            System.out.println(parsedLine);
-            return parsedLine;
+            cw.createArray(m.group("arr1"));
         } else {
-            return null;
+            m = ADD_PATT.matcher(line);
+            if (m.matches()) {
+                System.out.println(m.group("arr1"));
+                System.out.println(m.group("num"));
+                cw.addIntoArray(m.group("arr1"), Integer.parseInt(m.group("num")));
+            } else {
+                m = DIFF_PATT.matcher(line);
+                if (m.matches()) {
+                    cw.findArraysDiff(m.group("arr1"), m.group("arr2"));
+                } else {
+                    m = AND_PATT.matcher(line);
+                    if (m.matches()) {
+                        cw.findArraysCommon(m.group("arr1"), m.group("arr2"));
+                    } else {
+                        m = DEL_N_PATT.matcher(line);
+                        if (m.matches()) {
+                            cw.delNumberOfLinesInArray(m.group("arr1"), Integer.parseInt(m.group("num")));
+                        } else {
+                            m = DEL_ALL_PATT.matcher(line);
+                            if (m.matches()) {
+                                cw.delElemsArray(m.group("arr1"));
+                            } else {
+                                log.info("Unable to parse command");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -100,5 +105,6 @@ public class RegexWorker {
             e.printStackTrace();
         }
     }
-
 }
+
+
