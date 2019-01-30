@@ -1,4 +1,4 @@
-package commands_task;
+package commands.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;

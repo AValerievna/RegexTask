@@ -1,4 +1,4 @@
-package commands_task;
+package commands.task;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,12 +15,12 @@ import java.util.regex.Pattern;
 
 public class RegexWorker {
     private static final String REGEXP_1 = "\\.([^.]+)$";
-    public static final String CREATE_PATT = "^create [a-zA-Z_$]+[\\w_$]* *$";
-    private static final String ADD_PATT = "";
-    private static final String DIFF_PATT = "";
-    private static final String AND_PATT = "";
-    private static final String DEL_N_PATT = "";
-    private static final String DEL_ALL_PATT = "";
+    public static final Pattern CREATE_PATT = Pattern.compile("^create +[a-zA-Z_$]+[\\w_$]* *$");
+    private static final Pattern ADD_PATT = Pattern.compile("^add +[a-zA-Z_$]+[\\w_$]* +\\d+ *$");
+    private static final Pattern DIFF_PATT = Pattern.compile("^diff +[a-zA-Z_$]+[\\w_$]* +[a-zA-Z_$]+[\\w_$]* *$");
+    private static final Pattern AND_PATT = Pattern.compile("^and +[a-zA-Z_$]+[\\w_$]* +[a-zA-Z_$]+[\\w_$]* *$");
+    private static final Pattern DEL_N_PATT = Pattern.compile("del +[a-zA-Z_$]+[\\w_$]* +\\d+ *$");
+    private static final Pattern DEL_ALL_PATT = Pattern.compile("del +[a-zA-Z_$]+[\\w_$]* *$");
     protected static Logger log;
     public static Configuration conf;
     List<Integer> a, b, res;
@@ -78,15 +78,17 @@ public class RegexWorker {
         }
     }
 
-    public static String checkWithRegExp(String str, String pattStr) {
-        Pattern p = Pattern.compile(pattStr);
-        Matcher m = p.matcher(str);
-        m.matches();
-        System.out.println(m.matches());
-        String parsedLine = m.group();
-        System.out.println(m.group());
-        System.out.println(parsedLine);
-        return parsedLine;
+    public static String checkWithRegExp(String str, Pattern patt) {
+        Matcher m = patt.matcher(str);
+        if (m.matches()) {
+            System.out.println(m.matches());
+            String parsedLine = m.group();
+            System.out.println(m.group());
+            System.out.println(parsedLine);
+            return parsedLine;
+        } else {
+            return null;
+        }
     }
 
     private void writeListToFile(File sourceFile, ArrayList<String> lines) {
