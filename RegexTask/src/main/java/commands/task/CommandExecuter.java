@@ -1,6 +1,5 @@
 package commands.task;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -19,11 +18,11 @@ public class CommandExecuter {
     private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
 
     private CollectionCommandHandler comHandler;
-    private File resFile;
+    FileWriter fw;
 
-    public CommandExecuter(String resPathStr) {
+    public CommandExecuter(FileWriter fw) {
+        this.fw = fw;
         this.comHandler = new CollectionCommandHandler();
-        this.resFile = new File(resPathStr);
     }
 
     public void doCommandsWithLines(List<String> allLines) {
@@ -41,11 +40,12 @@ public class CommandExecuter {
                     m = DIFF_PATT.matcher(line);
                     if (m.matches()) {
                         Set<Integer> resSet = comHandler.findCollectionsDiff(m.group("coll1"), m.group("coll2"));
-                        writeSetToFile(resFile, resSet);
+                        writeSetToFile("diff result", resSet);
                     } else {
                         m = AND_PATT.matcher(line);
                         if (m.matches()) {
                             Set<Integer> resSet = comHandler.findCollectionsCommon(m.group("coll1"), m.group("coll2"));
+                            writeSetToFile("and result", resSet);
                         } else {
                             m = DEL_N_PATT.matcher(line);
                             if (m.matches()) {
@@ -65,8 +65,9 @@ public class CommandExecuter {
         }
     }
 
-    private void writeSetToFile(File file, Set<Integer> lines) {
-        try (FileWriter fw = new FileWriter(file, true)) {
+    private void writeSetToFile(String comment, Set<Integer> lines) {
+        try {
+            fw.write(comment + ": ");
             for (int elem : lines) {
                 fw.write(elem + " ");
             }

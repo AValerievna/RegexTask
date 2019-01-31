@@ -1,5 +1,7 @@
 package commands.task;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,8 +32,15 @@ public class App {
             e.printStackTrace();
         }
 
+        File resFile = new File(conf.getProperty("output.file.path"));
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(resFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if ((allLines != null) && (!allLines.isEmpty())) {
-            CommandExecuter comExec = new CommandExecuter(conf.getProperty("output.file.path"));
+            CommandExecuter comExec = new CommandExecuter(fw);
             comExec.doCommandsWithLines(allLines);
         }
     }
