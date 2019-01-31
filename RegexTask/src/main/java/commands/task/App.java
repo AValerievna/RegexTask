@@ -33,16 +33,15 @@ public class App {
         }
 
         File resFile = new File(conf.getProperty("output.file.path"));
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(resFile);
+        try (FileWriter fw = new FileWriter(resFile)) {
+            if ((allLines != null) && (!allLines.isEmpty())) {
+                CommandExecuter comExec = new CommandExecuter(fw);
+                comExec.doCommandsWithLines(allLines);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if ((allLines != null) && (!allLines.isEmpty())) {
-            CommandExecuter comExec = new CommandExecuter(fw);
-            comExec.doCommandsWithLines(allLines);
-        }
+
     }
 
 
