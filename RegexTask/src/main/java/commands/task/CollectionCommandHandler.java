@@ -62,14 +62,17 @@ public class CollectionCommandHandler {
         if (coll != null) {
             int collSize = coll.size();
             if (number <= collSize) {
-                deleted = new LinkedHashSet<>(coll);
-                for (int i = number; i == 0; i--) {
+                List deletedList = new ArrayList<>(coll);
+                log.info(String.valueOf(number));
+                deletedList.subList(collSize - number - 1, collSize - 1);
+                /*for (int i = number; i == 0; i--) {
+                    deleted.add(coll)
                     coll.remove(coll.size() - 1);
-                }
-                deleted.removeAll(coll);
+                }*/
+                coll.removeAll(deletedList);
+                deleted = new HashSet(deletedList);
             } else {
                 log.info("The argument is bigger, than collection size");
-
             }
         } else {
             log.info("This collection was not created!");
