@@ -4,43 +4,83 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static commands.task.RegexWorker.log;
+
 public class CommandWorker {
-    Map<String, LinkedHashSet<Integer>> arraysMap;
+    Map<String, LinkedHashSet<Integer>> collectionsMap;
 
 
     public CommandWorker() {
-        arraysMap = new HashMap<>();
+        collectionsMap = new HashMap<>();
     }
 
-    void createArray(String arrName) {
-        arraysMap.put(arrName, new LinkedHashSet<>());
+    void createCollection(String collName) {
+        collectionsMap.put(collName, new LinkedHashSet<>());
     }
 
-    void addIntoArray(String arrName, int number) {
-        arraysMap.get(arrName).add(number);
+    void addIntoCollection(String collName, int number) {
+        LinkedHashSet<Integer> coll = collectionsMap.get(collName);
+        if (coll != null) {
+            coll.add(number);
+        } else {
+            log.info("This collection was not created!");
+        }
+
     }
 
-    Set<Integer> findArraysDiff(String arrName1, String arrName2) {
-        return Stream.of(arraysMap.get(arrName1), arraysMap.get(arrName2)).flatMap(Collection::stream).filter(el -> !arraysMap.get(arrName2).contains(el)).collect(Collectors.toSet());
-    }
-
-    Set<Integer> findArraysCommon(String arrName1, String arrName2) {
-        return arraysMap.get(arrName1).stream().filter(arraysMap.get(arrName2)::contains).collect(Collectors.toSet());
-    }
-
-    void delNumberOfLinesInArray(String arrName, int number) {
-        for (int i = number; i == 0; i--) {
-            arraysMap.get(arrName).remove(arraysMap.get(arrName).size() - 1);
+    Set<Integer> findCollectionsDiff(String collName1, String collName2) {
+        LinkedHashSet<Integer> coll1 = collectionsMap.get(collName1);
+        LinkedHashSet<Integer> coll2 = collectionsMap.get(collName2);
+        if ((coll1 != null) && (coll2 != null)) {
+            return Stream.of(coll1, coll2).flatMap(Collection::stream).filter(el -> !coll2.contains(el)).collect(Collectors.toSet());
+        } else {
+            log.info("These collections were not created!");
+            return null;
         }
     }
 
-    void delElemsArray(String arrName) {
-        arraysMap.get(arrName).clear();
+    Set<Integer> findCollectionsCommon(String collName1, String collName2) {
+        LinkedHashSet<Integer> coll1 = collectionsMap.get(collName1);
+        LinkedHashSet<Integer> coll2 = collectionsMap.get(collName2);
+        if ((coll1 != null) && (coll2 != null)) {
+            return coll1.stream().filter(coll2::contains).collect(Collectors.toSet());
+        } else {
+            log.info("These collections were not created!");
+            return null;
+        }
+
     }
 
-    private void arrayOutput(List<Integer> arr) {
-        System.out.println("Result array:");
-        for (int s : arr) {
+    void delNumberOfLinesFromCollection(String collName, int number) {
+        LinkedHashSet<Integer> coll = collectionsMap.get(collName);
+        if (coll != null) {
+            int collSize = coll.size();
+            if (number <= collSize) {
+                for (int i = number; i == 0; i--) {
+                    coll.remove(coll.size() - 1);
+                }
+            } else {
+                log.info("The argument is bigger, than collection size");
+            }
+        } else {
+            log.info("This collection was not created!");
+        }
+
+    }
+
+    void delElemsFromCollection(String collName) {
+        LinkedHashSet<Integer> coll = collectionsMap.get(collName);
+        if (coll != null) {
+            coll.clear();
+        } else {
+            log.info("This collection was not created!");
+        }
+
+    }
+
+    private void collectOutput(List<Integer> coll) {
+        System.out.println("Result collay:");
+        for (int s : coll) {
             System.out.println(s);
         }
     }

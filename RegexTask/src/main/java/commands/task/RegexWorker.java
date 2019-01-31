@@ -15,12 +15,12 @@ import java.util.regex.Pattern;
 
 public class RegexWorker {
     private static final String REGEXP_1 = "\\.([^.]+)$";
-    public static final Pattern CREATE_PATT = Pattern.compile("^create\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
-    private static final Pattern ADD_PATT = Pattern.compile("^add\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
-    private static final Pattern DIFF_PATT = Pattern.compile("^diff\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<arr2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
-    private static final Pattern AND_PATT = Pattern.compile("^and\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<arr2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
-    private static final Pattern DEL_N_PATT = Pattern.compile("^del\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
-    private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<arr1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    public static final Pattern CREATE_PATT = Pattern.compile("^create\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    private static final Pattern ADD_PATT = Pattern.compile("^add\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
+    private static final Pattern DIFF_PATT = Pattern.compile("^diff\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<coll2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    private static final Pattern AND_PATT = Pattern.compile("^and\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<coll2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
+    private static final Pattern DEL_N_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
+    private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
     protected static Logger log;
     public static Configuration conf;
     static CommandWorker cw;
@@ -63,27 +63,27 @@ public class RegexWorker {
 
         Matcher m = CREATE_PATT.matcher(line);
         if (m.matches()) {
-            cw.createArray(m.group("arr1"));
+            cw.createCollection(m.group("coll1"));
         } else {
             m = ADD_PATT.matcher(line);
             if (m.matches()) {
-                cw.addIntoArray(m.group("arr1"), Integer.parseInt(m.group("num")));
+                cw.addIntoCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
             } else {
                 m = DIFF_PATT.matcher(line);
                 if (m.matches()) {
-                    cw.findArraysDiff(m.group("arr1"), m.group("arr2"));
+                    cw.findCollectionsDiff(m.group("coll1"), m.group("coll2"));
                 } else {
                     m = AND_PATT.matcher(line);
                     if (m.matches()) {
-                        cw.findArraysCommon(m.group("arr1"), m.group("arr2"));
+                        cw.findCollectionsCommon(m.group("coll1"), m.group("coll2"));
                     } else {
                         m = DEL_N_PATT.matcher(line);
                         if (m.matches()) {
-                            cw.delNumberOfLinesInArray(m.group("arr1"), Integer.parseInt(m.group("num")));
+                            cw.delNumberOfLinesFromCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
                         } else {
                             m = DEL_ALL_PATT.matcher(line);
                             if (m.matches()) {
-                                cw.delElemsArray(m.group("arr1"));
+                                cw.delElemsFromCollection(m.group("coll1"));
                             } else {
                                 log.info("Unable to parse command");
                             }
