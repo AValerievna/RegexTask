@@ -56,31 +56,37 @@ public class CollectionCommandHandler {
 
     }
 
-    void delNumberOfLinesFromCollection(String collName, int number) {
+    Set<Integer> delNumberOfLinesFromCollection(String collName, int number) {
         LinkedHashSet<Integer> coll = collectionsMap.get(collName);
+        Set<Integer> deleted = null;
         if (coll != null) {
             int collSize = coll.size();
             if (number <= collSize) {
+                deleted = new LinkedHashSet<>(coll);
                 for (int i = number; i == 0; i--) {
                     coll.remove(coll.size() - 1);
                 }
+                deleted.removeAll(coll);
             } else {
                 log.info("The argument is bigger, than collection size");
+
             }
         } else {
             log.info("This collection was not created!");
         }
-
+        return deleted;
     }
 
-    void delElemsFromCollection(String collName) {
+    Set<Integer> delElemsFromCollection(String collName) {
         LinkedHashSet<Integer> coll = collectionsMap.get(collName);
+        Set<Integer> deleted = null;
         if (coll != null) {
+            deleted = new LinkedHashSet<>(coll);
             coll.clear();
         } else {
             log.info("This collection was not created!");
         }
-
+        return deleted;
     }
 
     private void collectOutput(List<Integer> coll) {

@@ -49,11 +49,13 @@ public class CommandExecuter {
                         } else {
                             m = DEL_N_PATT.matcher(line);
                             if (m.matches()) {
-                                comHandler.delNumberOfLinesFromCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
+                                Set<Integer> resSet = comHandler.delNumberOfLinesFromCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
+                                writeSetToFile("del num result", resSet);
                             } else {
                                 m = DEL_ALL_PATT.matcher(line);
                                 if (m.matches()) {
-                                    comHandler.delElemsFromCollection(m.group("coll1"));
+                                    Set<Integer> resSet = comHandler.delElemsFromCollection(m.group("coll1"));
+                                    writeSetToFile("del all result", resSet);
                                 } else {
                                     log.info("Unable to parse command");
                                 }
