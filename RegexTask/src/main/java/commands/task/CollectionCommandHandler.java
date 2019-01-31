@@ -4,13 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static commands.task.RegexWorker.log;
+import static commands.task.App.log;
 
-public class CommandWorker {
+public class CollectionCommandHandler {
     Map<String, LinkedHashSet<Integer>> collectionsMap;
 
 
-    public CommandWorker() {
+    public CollectionCommandHandler() {
         collectionsMap = new HashMap<>();
     }
 
@@ -32,7 +32,10 @@ public class CommandWorker {
         LinkedHashSet<Integer> coll1 = collectionsMap.get(collName1);
         LinkedHashSet<Integer> coll2 = collectionsMap.get(collName2);
         if ((coll1 != null) && (coll2 != null)) {
-            return Stream.of(coll1, coll2).flatMap(Collection::stream).filter(el -> !coll2.contains(el)).collect(Collectors.toSet());
+            return Stream.of(coll1, coll2)
+                    .flatMap(Collection::stream)
+                    .filter(el -> !(coll2.contains(el) && coll1.contains(el)))
+                    .collect(Collectors.toSet());
         } else {
             log.info("These collections were not created!");
             return null;
@@ -43,7 +46,9 @@ public class CommandWorker {
         LinkedHashSet<Integer> coll1 = collectionsMap.get(collName1);
         LinkedHashSet<Integer> coll2 = collectionsMap.get(collName2);
         if ((coll1 != null) && (coll2 != null)) {
-            return coll1.stream().filter(coll2::contains).collect(Collectors.toSet());
+            return coll1.stream()
+                    .filter(coll2::contains)
+                    .collect(Collectors.toSet());
         } else {
             log.info("These collections were not created!");
             return null;

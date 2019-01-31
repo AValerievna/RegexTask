@@ -3,63 +3,26 @@ package commands.task;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegexWorker {
-    private static final String REGEXP_1 = "\\.([^.]+)$";
+import static commands.task.App.log;
+
+public class CommandExecuter {
     public static final Pattern CREATE_PATT = Pattern.compile("^create\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
     private static final Pattern ADD_PATT = Pattern.compile("^add\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
     private static final Pattern DIFF_PATT = Pattern.compile("^diff\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<coll2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
     private static final Pattern AND_PATT = Pattern.compile("^and\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<coll2>[a-zA-Z_$]+[\\w_$]*)\\s*$");
     private static final Pattern DEL_N_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
     private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
-    protected static Logger log;
-    public static Configuration conf;
-    static CommandWorker cw;
 
+    private CollectionCommandHandler cw;
+    private File resFile;
 
-    public static void main(String[] args) {
-        log = Logger.getGlobal();
-        try {
-            conf = new Configuration();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        cw = new CommandWorker();
-
-        String pathStr = conf.getProperty("file.path");
-        Path path = Paths.get(pathStr);
-        File sourceFile = new File(pathStr);
-        List<String> allLines = null;
-        try {
-            allLines = Files.readAllLines(path, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int linesCount = 0;
-        if (allLines != null) {
-            linesCount = allLines.size();
-        }
-
-        if (allLines != null) {
-            for (int i = 0; i < linesCount; i++) {
-                doCommandWithLine(allLines.get(i));
-            }
-        }
-
-
-    }
-
-    private static void doCommandWithLine(String line) {
+    private void doCommandWithLine(String line) {
 
         Matcher m = CREATE_PATT.matcher(line);
         if (m.matches()) {
@@ -71,11 +34,12 @@ public class RegexWorker {
             } else {
                 m = DIFF_PATT.matcher(line);
                 if (m.matches()) {
-                    cw.findCollectionsDiff(m.group("coll1"), m.group("coll2"));
+                    LinkedHashSet<Integer> resSet = cw.findCollectionsDiff(m.group("coll1"), m.group("coll2"));
+                    writeSetToFile(resFile, resSet);
                 } else {
                     m = AND_PATT.matcher(line);
                     if (m.matches()) {
-                        cw.findCollectionsCommon(m.group("coll1"), m.group("coll2"));
+                        Set<Integer> resSet = cw.findCollectionsCommon(m.group("coll1"), m.group("coll2"));
                     } else {
                         m = DEL_N_PATT.matcher(line);
                         if (m.matches()) {
@@ -94,7 +58,22 @@ public class RegexWorker {
         }
     }
 
-    private void writeListToFile(File sourceFile, ArrayList<String> lines) {
+    public void doCommandsWithLines(List<String> allLines, String resPathStr) {
+        int linesCount = 0;
+        if (allLines != null) {
+            linesCount = allLines.size();
+        }
+
+        if (allLines != null) {
+            cw = new CollectionCommandHandler();
+            resFile = new File(resPathStr);
+            for (int i = 0; i < linesCount; i++) {
+                doCommandWithLine(allLines.get(i));
+            }
+        }
+    }
+
+    private void writeSetToFile(File sourceFile, LinkedHashSet<String> lines) {
         try (FileWriter fw = new FileWriter(sourceFile)) {
             for (String line : lines) {
                 fw.write(line + "\n");
@@ -104,5 +83,3 @@ public class RegexWorker {
         }
     }
 }
-
-
