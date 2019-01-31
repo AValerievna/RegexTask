@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class App {
-    private static final String REGEXP_1 = "\\.([^.]+)$";
     protected static Logger log;
     public static Configuration conf;
 
@@ -31,10 +30,10 @@ public class App {
             e.printStackTrace();
         }
 
-        CommandExecuter comExec = new CommandExecuter();
-        comExec.doCommandsWithLines(allLines, conf.getProperty("output.file.path"));
-
-
+        if ((allLines != null) && (!allLines.isEmpty())) {
+            CommandExecuter comExec = new CommandExecuter(conf.getProperty("output.file.path"));
+            comExec.doCommandsWithLines(allLines);
+        }
     }
 
 

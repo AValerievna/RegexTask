@@ -3,7 +3,6 @@ package commands.task;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -19,37 +18,45 @@ public class CommandExecuter {
     private static final Pattern DEL_N_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s+(?<num>-?\\d+)\\s*$");
     private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
 
-    private CollectionCommandHandler cw;
+    private CollectionCommandHandler comHandler;
     private File resFile;
 
-    private void doCommandWithLine(String line) {
+    public CommandExecuter(String resPathStr) {
+        this.comHandler = new CollectionCommandHandler();
+        this.resFile = new File(resPathStr);
+    }
 
-        Matcher m = CREATE_PATT.matcher(line);
-        if (m.matches()) {
-            cw.createCollection(m.group("coll1"));
-        } else {
-            m = ADD_PATT.matcher(line);
+    public void doCommandsWithLines(List<String> allLines) {
+        int linesCount = allLines.size();
+        for (int i = 0; i < linesCount; i++) {
+            String line = allLines.get(i);
+            Matcher m = CREATE_PATT.matcher(line);
             if (m.matches()) {
-                cw.addIntoCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
+                comHandler.createCollection(m.group("coll1"));
             } else {
-                m = DIFF_PATT.matcher(line);
+                m = ADD_PATT.matcher(line);
                 if (m.matches()) {
-                    LinkedHashSet<Integer> resSet = cw.findCollectionsDiff(m.group("coll1"), m.group("coll2"));
-                    writeSetToFile(resFile, resSet);
+                    comHandler.addIntoCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
                 } else {
-                    m = AND_PATT.matcher(line);
+                    m = DIFF_PATT.matcher(line);
                     if (m.matches()) {
-                        Set<Integer> resSet = cw.findCollectionsCommon(m.group("coll1"), m.group("coll2"));
+                        Set<Integer> resSet = comHandler.findCollectionsDiff(m.group("coll1"), m.group("coll2"));
+                        writeSetToFile(resFile, resSet);
                     } else {
-                        m = DEL_N_PATT.matcher(line);
+                        m = AND_PATT.matcher(line);
                         if (m.matches()) {
-                            cw.delNumberOfLinesFromCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
+                            Set<Integer> resSet = comHandler.findCollectionsCommon(m.group("coll1"), m.group("coll2"));
                         } else {
-                            m = DEL_ALL_PATT.matcher(line);
+                            m = DEL_N_PATT.matcher(line);
                             if (m.matches()) {
-                                cw.delElemsFromCollection(m.group("coll1"));
+                                comHandler.delNumberOfLinesFromCollection(m.group("coll1"), Integer.parseInt(m.group("num")));
                             } else {
-                                log.info("Unable to parse command");
+                                m = DEL_ALL_PATT.matcher(line);
+                                if (m.matches()) {
+                                    comHandler.delElemsFromCollection(m.group("coll1"));
+                                } else {
+                                    log.info("Unable to parse command");
+                                }
                             }
                         }
                     }
@@ -58,26 +65,12 @@ public class CommandExecuter {
         }
     }
 
-    public void doCommandsWithLines(List<String> allLines, String resPathStr) {
-        int linesCount = 0;
-        if (allLines != null) {
-            linesCount = allLines.size();
-        }
-
-        if (allLines != null) {
-            cw = new CollectionCommandHandler();
-            resFile = new File(resPathStr);
-            for (int i = 0; i < linesCount; i++) {
-                doCommandWithLine(allLines.get(i));
+    private void writeSetToFile(File file, Set<Integer> lines) {
+        try (FileWriter fw = new FileWriter(file, true)) {
+            for (int elem : lines) {
+                fw.write(elem + " ");
             }
-        }
-    }
-
-    private void writeSetToFile(File sourceFile, LinkedHashSet<String> lines) {
-        try (FileWriter fw = new FileWriter(sourceFile)) {
-            for (String line : lines) {
-                fw.write(line + "\n");
-            }
+            fw.write("\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
