@@ -44,7 +44,6 @@ public class App {
         log.info("First task \"Commands with collections\" finished");
 
 
-        //TEMPORARY DECISION
         sourcePath = Paths.get(conf.getProperty("html.file.path"));
         String htmlLines = null;
         try {
@@ -56,8 +55,8 @@ public class App {
         resFile = new File(conf.getProperty("html.output.file.path"));
         try (FileWriter fw = new FileWriter(resFile)) {
             if ((htmlLines != null) && (!htmlLines.isEmpty())) {
-                HtmlParser comExec = new HtmlParser(fw);
-                comExec.parseHtml(htmlLines);
+                HtmlParser htmlParser = new HtmlParser(fw);
+                htmlParser.parseHtml(htmlLines);
             }
         } catch (IOException e) {
             e.printStackTrace();

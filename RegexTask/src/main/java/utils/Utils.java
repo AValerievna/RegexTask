@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.Set;
 
 public class Utils {
-    public static final String SPACE = " ";
-    public static final String NEW_LINE = "\n";
+    private static final String SPACE = " ";
+    private static final String NEW_LINE = "\n";
 
     public static <T> void writeSetToFile(FileWriter fw, String comment, Set<T> lines) {
         try {

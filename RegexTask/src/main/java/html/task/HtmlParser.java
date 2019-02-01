@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import static utils.Utils.writeSetToFile;
 
 public class HtmlParser {
-    public static final String NEW_LINE = "\n";
+    private static final String NEW_LINE = "\n";
     private FileWriter fw;
     private Logger log;
     private static final Pattern FORM_PATT = Pattern.compile("<form.*?id=\"index_login_form\".*?<\\/form>", Pattern.DOTALL);
