@@ -14,8 +14,8 @@ public class HtmlParser {
     private FileWriter fw;
     private Logger log;
     private static final Pattern FORM_PATT = Pattern.compile("<form.*?id=\"index_login_form\".*?<\\/form>", Pattern.DOTALL);
-    private static final Pattern ACT_PATT = Pattern.compile("<form.*?action=\"(?<ref>.*?)\">", Pattern.DOTALL);
-    private static final Pattern INPUT_PATT = Pattern.compile("<input.*?value=\"(?<val>.*?)\">", Pattern.DOTALL);
+    private static final Pattern ACT_PATT = Pattern.compile("<form.*?action=\"(?<ref>.*?)\".*?>", Pattern.DOTALL);
+    private static final Pattern INPUT_PATT = Pattern.compile("<input.*?value=\"(?<val>.*?)\".*?>", Pattern.DOTALL);
 
     public HtmlParser(FileWriter fw) {
         this.fw = fw;
