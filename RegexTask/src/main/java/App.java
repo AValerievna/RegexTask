@@ -1,4 +1,6 @@
-package commands.task;
+import commands.task.CommandExecuter;
+import configuration.Configuration;
+import html.task.HtmlParser;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,23 +10,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class App {
-    protected static Logger log;
     public static Configuration conf;
 
     public static void main(String[] args) {
-        log = Logger.getGlobal();
         try {
             conf = new Configuration();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        String sourcePathStr = conf.getProperty("source.file.path");
-        Path sourcePath = Paths.get(sourcePathStr);
-
+        Path sourcePath = Paths.get(conf.getProperty("source.file.path"));
         List<String> allLines = null;
         try {
             allLines = Files.readAllLines(sourcePath, StandardCharsets.UTF_8);
@@ -37,6 +34,26 @@ public class App {
             if ((allLines != null) && (!allLines.isEmpty())) {
                 CommandExecuter comExec = new CommandExecuter(fw);
                 comExec.doCommandsWithLines(allLines);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //TEMPORARY DECISION
+        sourcePath = Paths.get(conf.getProperty("html.file.path"));
+        allLines = null;
+        try {
+            allLines = Files.readAllLines(sourcePath, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        resFile = new File(conf.getProperty("html.output.file.path"));
+        try (FileWriter fw = new FileWriter(resFile)) {
+            if ((allLines != null) && (!allLines.isEmpty())) {
+                HtmlParser comExec = new HtmlParser();
+                comExec.parseHtml(allLines);
             }
         } catch (IOException e) {
             e.printStackTrace();

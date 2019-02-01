@@ -1,17 +1,19 @@
 package commands.task;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static commands.task.App.log;
 
 public class CollectionCommandHandler {
-    Map<String, LinkedHashSet<Integer>> collectionsMap;
+    private Map<String, LinkedHashSet<Integer>> collectionsMap;
+    private Logger log;
 
 
     public CollectionCommandHandler() {
         collectionsMap = new HashMap<>();
+        log = Logger.getLogger(CollectionCommandHandler.class.getName());
     }
 
     void createCollection(String collName) {
@@ -58,19 +60,14 @@ public class CollectionCommandHandler {
 
     Set<Integer> delNumberOfLinesFromCollection(String collName, int number) {
         LinkedHashSet<Integer> coll = collectionsMap.get(collName);
-        Set<Integer> deleted = null;
+        LinkedHashSet<Integer> deleted = null;
         if (coll != null) {
             int collSize = coll.size();
             if (number <= collSize) {
                 List deletedList = new ArrayList<>(coll);
-                log.info(String.valueOf(number));
-                deletedList.subList(collSize - number - 1, collSize - 1);
-                /*for (int i = number; i == 0; i--) {
-                    deleted.add(coll)
-                    coll.remove(coll.size() - 1);
-                }*/
+                deletedList = deletedList.subList(collSize - number - 1, collSize - 1);
                 coll.removeAll(deletedList);
-                deleted = new HashSet(deletedList);
+                deleted = new LinkedHashSet<Integer>(deletedList);
             } else {
                 log.info("The argument is bigger, than collection size");
             }
@@ -90,12 +87,5 @@ public class CollectionCommandHandler {
             log.info("This collection was not created!");
         }
         return deleted;
-    }
-
-    private void collectOutput(List<Integer> coll) {
-        System.out.println("Result collay:");
-        for (int s : coll) {
-            System.out.println(s);
-        }
     }
 }
