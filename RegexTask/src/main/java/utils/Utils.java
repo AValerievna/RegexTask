@@ -8,15 +8,22 @@ public class Utils {
     public static final String SPACE = " ";
     public static final String NEW_LINE = "\n";
 
-    public static void writeSetToFile(FileWriter fw, String comment, Set<Integer> lines) {
+    public static <T> void writeSetToFile(FileWriter fw, String comment, Set<T> lines) {
         try {
             fw.write(comment + ": ");
-            for (int elem : lines) {
-                fw.write(elem + SPACE);
-            }
+            lines.forEach(elem ->
+            {
+                try {
+                    fw.write(elem + SPACE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
             fw.write(NEW_LINE);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 }
