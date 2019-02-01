@@ -10,11 +10,12 @@ import java.util.regex.Pattern;
 import static utils.Utils.writeSetToFile;
 
 public class HtmlParser {
+    public static final String NEW_LINE = "\n";
     private FileWriter fw;
     private Logger log;
     private static final Pattern FORM_PATT = Pattern.compile("<form.*?id=\"index_login_form\".*?<\\/form>", Pattern.DOTALL);
     private static final Pattern ACT_PATT = Pattern.compile("<form.*?action=\"(?<ref>.*?)\">", Pattern.DOTALL);
-    private static final Pattern INPUT_PATT = Pattern.compile("<input.*?>", Pattern.DOTALL);
+    private static final Pattern INPUT_PATT = Pattern.compile("<input.*?value=\"(?<val>.*?)\">", Pattern.DOTALL);
 
     public HtmlParser(FileWriter fw) {
         this.fw = fw;
@@ -26,18 +27,18 @@ public class HtmlParser {
         if (m.find()) {
             try {
                 String formInnerHtml = m.toString();
-                fw.write("Form content: " + formInnerHtml);
+                fw.write("Form content: " + formInnerHtml + NEW_LINE);
                 m = ACT_PATT.matcher(formInnerHtml);
                 if (m.find()) {
                     String actionRef = m.group("ref");
-                    fw.write("Action ref: " + actionRef);
+                    fw.write("Action ref: " + actionRef + NEW_LINE);
                     m = INPUT_PATT.matcher(formInnerHtml);
                     LinkedHashSet<String> inputValues = new LinkedHashSet<>();
                     while (m.find()) {
-                        inputValues.add(m.group());
+                        inputValues.add(m.group("val"));
                     }
                     if (!inputValues.isEmpty()) {
-                        writeSetToFile(fw, "Form content", inputValues);
+                        writeSetToFile(fw, "Input values", inputValues);
 
                     } else {
                         log.info("There is no input-values in html line");
