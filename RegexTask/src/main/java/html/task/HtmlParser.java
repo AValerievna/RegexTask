@@ -26,7 +26,7 @@ public class HtmlParser {
         Matcher m = FORM_PATT.matcher(line);
         if (m.find()) {
             try {
-                String formInnerHtml = m.toString();
+                String formInnerHtml = m.group();
                 fw.write("Form content: " + formInnerHtml + NEW_LINE);
                 m = ACT_PATT.matcher(formInnerHtml);
                 if (m.find()) {
