@@ -10,11 +10,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class App {
     public static Configuration conf;
 
     public static void main(String[] args) {
+        Logger log = Logger.getLogger(CommandExecuter.class.getName());
         try {
             conf = new Configuration();
         } catch (IOException e) {
@@ -38,6 +40,7 @@ public class App {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        log.info("First task \"Commands with collections\" finished");
 
 
         //TEMPORARY DECISION
@@ -58,6 +61,7 @@ public class App {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        log.info("Second task \"Html parsing\" finished");
 
     }
 
