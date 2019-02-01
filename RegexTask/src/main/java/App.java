@@ -11,12 +11,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class App {
     public static Configuration conf;
 
     public static void main(String[] args) {
-        Logger log = Logger.getLogger(CommandExecuter.class.getName());
+        Logger log = Logger.getLogger(App.class.getName());
         try {
             conf = new Configuration();
         } catch (IOException e) {
@@ -45,18 +46,18 @@ public class App {
 
         //TEMPORARY DECISION
         sourcePath = Paths.get(conf.getProperty("html.file.path"));
-        allLines = null;
+        String htmlLines = null;
         try {
-            allLines = Files.readAllLines(sourcePath, StandardCharsets.UTF_8);
+            htmlLines = Files.lines(sourcePath, StandardCharsets.UTF_8).collect(Collectors.joining());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         resFile = new File(conf.getProperty("html.output.file.path"));
         try (FileWriter fw = new FileWriter(resFile)) {
-            if ((allLines != null) && (!allLines.isEmpty())) {
-                HtmlParser comExec = new HtmlParser();
-                comExec.parseHtml(allLines);
+            if ((htmlLines != null) && (!htmlLines.isEmpty())) {
+                HtmlParser comExec = new HtmlParser(fw);
+                comExec.parseHtml(htmlLines);
             }
         } catch (IOException e) {
             e.printStackTrace();
