@@ -14,52 +14,35 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class App {
-    public static Configuration conf;
+    private static Configuration conf;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Logger log = Logger.getLogger(App.class.getName());
-        try {
-            conf = new Configuration();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        conf = new Configuration();
 
         Path sourcePath = Paths.get(conf.getProperty("source.file.path"));
-        List<String> allLines = null;
-        try {
-            allLines = Files.readAllLines(sourcePath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> allLines = Files.readAllLines(sourcePath, StandardCharsets.UTF_8);
+
 
         File resFile = new File(conf.getProperty("output.file.path"));
         try (FileWriter fw = new FileWriter(resFile)) {
-            if ((allLines != null) && (!allLines.isEmpty())) {
+            if (!allLines.isEmpty()) {
                 CommandExecuter comExec = new CommandExecuter(fw);
                 comExec.doCommandsWithLines(allLines);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         log.info("First task \"Commands with collections\" finished");
 
 
-        sourcePath = Paths.get(conf.getProperty("html.file.path"));
-        String htmlLines = null;
-        try {
-            htmlLines = Files.lines(sourcePath, StandardCharsets.UTF_8).collect(Collectors.joining());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Path htmlSourcePath = Paths.get(conf.getProperty("html.file.path"));
+        String htmlLines = Files.lines(htmlSourcePath, StandardCharsets.UTF_8).collect(Collectors.joining());
 
-        resFile = new File(conf.getProperty("html.output.file.path"));
-        try (FileWriter fw = new FileWriter(resFile)) {
+        File htmlResFile = new File(conf.getProperty("html.output.file.path"));
+        try (FileWriter fw = new FileWriter(htmlResFile)) {
             if ((htmlLines != null) && (!htmlLines.isEmpty())) {
                 HtmlParser htmlParser = new HtmlParser(fw);
                 htmlParser.parseHtml(htmlLines);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         log.info("Second task \"Html parsing\" finished");
 

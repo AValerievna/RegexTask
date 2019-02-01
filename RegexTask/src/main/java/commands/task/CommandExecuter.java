@@ -1,13 +1,13 @@
 package commands.task;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static utils.Utils.writeSetToFile;
 
 public class CommandExecuter {
     private static final Pattern CREATE_PATT = Pattern.compile("^create\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
@@ -19,10 +19,7 @@ public class CommandExecuter {
     private static final Pattern DEL_ALL_PATT = Pattern.compile("^del\\s+(?<coll1>[a-zA-Z_$]+[\\w_$]*)\\s*$");
     private static final String NUM_GROUP = "num";
     private static final String COLL2_GROUP = "coll2";
-    private static final String DIFF_COMMENT = "diff result";
-    private static final String AND_COMMENT = "and result";
-    private static final String DEL_NUM_COMMENT = "del num result";
-    private static final String DEL_ALL_COMMENT = "del all result";
+    private static final String NEW_LINE = "\n";
 
     private CollectionCommandHandler comHandler;
     private FileWriter fw;
@@ -34,7 +31,7 @@ public class CommandExecuter {
         log = Logger.getLogger(CommandExecuter.class.getName());
     }
 
-    public void doCommandsWithLines(List<String> allLines) {
+    public void doCommandsWithLines(List<String> allLines) throws IOException {
         for (String line : allLines) {
             Matcher m = CREATE_PATT.matcher(line);
             if (m.matches()) {
@@ -47,22 +44,22 @@ public class CommandExecuter {
                     m = DIFF_PATT.matcher(line);
                     if (m.matches()) {
                         Set<Integer> resSet = comHandler.findCollectionsDiff(m.group(COLL1_GROUP), m.group(COLL2_GROUP));
-                        writeSetToFile(fw, DIFF_COMMENT, resSet);
+                        fw.write("Diff result: " + resSet.toString() + NEW_LINE);
                     } else {
                         m = AND_PATT.matcher(line);
                         if (m.matches()) {
                             Set<Integer> resSet = comHandler.findCollectionsCommon(m.group(COLL1_GROUP), m.group(COLL2_GROUP));
-                            writeSetToFile(fw, AND_COMMENT, resSet);
+                            fw.write("And result: " + resSet.toString() + NEW_LINE);
                         } else {
                             m = DEL_N_PATT.matcher(line);
                             if (m.matches()) {
                                 Set<Integer> resSet = comHandler.delNumberOfLinesFromCollection(m.group(COLL1_GROUP), Integer.parseInt(m.group(NUM_GROUP)));
-                                writeSetToFile(fw, DEL_NUM_COMMENT, resSet);
+                                fw.write("Del num result: " + resSet.toString() + NEW_LINE);
                             } else {
                                 m = DEL_ALL_PATT.matcher(line);
                                 if (m.matches()) {
                                     Set<Integer> resSet = comHandler.delElemsFromCollection(m.group(COLL1_GROUP));
-                                    writeSetToFile(fw, DEL_ALL_COMMENT, resSet);
+                                    fw.write("Del all result: " + resSet.toString() + NEW_LINE);
                                 } else {
                                     log.info("Unable to parse command");
                                 }
